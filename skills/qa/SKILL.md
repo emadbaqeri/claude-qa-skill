@@ -8,19 +8,59 @@ description: Browser-based QA test suite runner using Playwright MCP. Explores t
 ## Invocation
 
 ```
-/qa                        # auto-detect: setup if no qa/tasks/, run all if exists
-/qa setup                  # (re)generate qa/tasks/ from codebase analysis
-/qa run                    # run full suite
-/qa run 01 04 14           # run specific tasks by number
-/qa run auth users         # run tasks whose filename matches
-/qa run --resume           # skip tasks that already have a result file
-/qa export <file.md>       # convert a results .md to .docx
+/qa                           # auto-detect: setup if no qa/tasks/, run all if exists
+/qa setup                     # (re)generate qa/tasks/ from codebase analysis
+/qa <topic>                   # focused setup: generate + run task files for one topic area
+/qa run                       # run full suite
+/qa run 01 04 14              # run specific tasks by number
+/qa run auth users            # run tasks whose filename matches
+/qa run --resume              # skip tasks that already have a result file
+/qa export <file.md>          # convert a results .md to .docx
 ```
 
 ## Auto-detect (bare `/qa`)
 
 - `qa/tasks/` does not exist → **Setup flow**
 - `qa/tasks/` exists → **Run flow** (full suite)
+
+## Recognising `/qa <topic>`
+
+If the argument is not one of the reserved keywords (`setup`, `run`, `export`) and does not look like a flag or file path, treat it as a **topic** and enter the **Focused setup flow**.
+
+Examples that trigger focused setup:
+- `/qa authentication & authorization`
+- `/qa payments`
+- `/qa user roles`
+- `/qa onboarding flow`
+
+---
+
+## Focused setup flow
+
+Triggered by `/qa <topic>`. Generates task files scoped to one area and immediately runs them.
+
+**Step 1 — Explore for the topic.** Read only what's relevant:
+- Files whose name or path relates to the topic (e.g. `auth`, `login`, `session`, `permission`, `middleware`, `guard`, `role`)
+- Middleware, guards, decorators, or interceptors that enforce the topic's rules
+- Route definitions that are gated by the topic's logic
+- Models / schemas involved (e.g. `User`, `Role`, `Session`, `Permission`)
+- Seed files or fixtures that create accounts / roles relevant to the topic
+
+**Step 2 — Infer.** Build a mental model limited to the topic:
+- What flows exist (e.g. login, logout, token refresh, role-based redirects)
+- What's enforced server-side vs. client-side
+- What user types / roles interact with this area
+
+**Step 3 — Gap interview.** Ask ONLY what code cannot reveal:
+- Test account credentials if not in seed/fixture files
+- Anything genuinely ambiguous after exploration
+
+**Step 4 — Confirm.** Present your plan:
+> "Here's what I'll generate for [topic]: [list of task files + test cases + accounts + base URL]. Does this look right?"
+
+**Step 5 — Generate.** Write only the task files relevant to the topic into `qa/tasks/`. Use existing file numbering if `qa/tasks/` already contains files (pick the next available number); otherwise start from `01`.
+
+**Step 6 — Run.** Immediately execute the generated task files using the Run flow. Write results to `qa/results/`.
 
 ---
 
