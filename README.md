@@ -23,14 +23,14 @@ Reports follow a UAT executive format: pass/fail/skip counts, bug severity tiers
 ### One-liner (recommended)
 
 ```bash
-git clone https://github.com/YOUR_ORG/qa-skill.git /tmp/qa-skill && bash /tmp/qa-skill/install.sh && rm -rf /tmp/qa-skill
+git clone https://github.com/emadbaqeri/claude-qa-skill.git /tmp/qa-skill && bash /tmp/qa-skill/install.sh && rm -rf /tmp/qa-skill
 ```
 
 ### Manual
 
 ```bash
-git clone https://github.com/YOUR_ORG/qa-skill.git
-cd qa-skill
+git clone https://github.com/emadbaqeri/claude-qa-skill.git
+cd claude-qa-skill
 bash install.sh
 ```
 
@@ -41,7 +41,7 @@ The script copies `skills/qa/` to `~/.claude/skills/qa/`. If a previous install 
 Re-run `install.sh` — it backs up the old version automatically.
 
 ```bash
-git clone https://github.com/YOUR_ORG/qa-skill.git /tmp/qa-skill && bash /tmp/qa-skill/install.sh && rm -rf /tmp/qa-skill
+git clone https://github.com/emadbaqeri/claude-qa-skill.git /tmp/qa-skill && bash /tmp/qa-skill/install.sh && rm -rf /tmp/qa-skill
 ```
 
 ## Uninstall
