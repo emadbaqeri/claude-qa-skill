@@ -1,6 +1,8 @@
 # QA Runner — Reference
 
-## Page Patterns
+---
+
+## Web Page Patterns
 
 Classify each discovered route into one of these patterns, then instantiate the matching test template.
 
@@ -102,9 +104,209 @@ Classify each discovered route into one of these patterns, then instantiate the 
 
 ---
 
-## Universal Test Cases
+## Mobile Screen Patterns
 
-These go into `01-auth.md`, `02-navigation.md`, and the final `XX-cross-cutting.md` regardless of project type.
+Classify each discovered screen into one of these patterns, then instantiate the matching test template. Use `testID` props as the primary selector strategy; fall back to text/label matching when `testID` is absent.
+
+---
+
+### Pattern: List Screen
+
+**Triggers:** A screen backed by `FlatList` or `SectionList` displaying a collection of items.
+**Examples:** Feed, Inbox, Order History, Search Results, Contacts
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Load | Screen renders with at least one list item visible |
+| 2 | Scroll down | Scroll to bottom — new items load (infinite scroll) or end indicator appears |
+| 3 | Pull to refresh | Pull from top → refresh spinner → list reloads |
+| 4 | Tap item | Tap a list item → correct detail screen opens |
+| 5 | Search / filter | Search input narrows list to matching items |
+| 6 | Clear search | Clearing search restores full list |
+| 7 | Empty state | Filtered/empty list shows friendly empty state (not blank screen) |
+| 8 | Loading state | Skeleton or spinner visible while data loads |
+| 9 | Error state | Network error shows retry prompt, not crash |
+| 10 | Swipe action | Swipe left/right on item reveals action buttons (if applicable) |
+| 11 | Permission: write | Add/create button absent for view-only user |
+
+---
+
+### Pattern: Auth Screen
+
+**Triggers:** Login, registration, OTP, password reset, or biometric prompt screens.
+**Examples:** Login, Sign Up, Forgot Password, OTP Verification, Biometric Prompt
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Load | Screen renders all fields and submit button |
+| 2 | Valid login | Enter valid credentials → submit → lands on home/dashboard |
+| 3 | Invalid credentials | Enter wrong password → inline error shown, no crash |
+| 4 | Empty submit | Submit with empty fields → field validation errors shown |
+| 5 | Invalid email format | Enter malformed email → format error before submission |
+| 6 | Keyboard avoidance | Input fields remain visible when keyboard opens |
+| 7 | Submit loading | Submit button shows loading indicator during request |
+| 8 | Logout | Logout → returns to login screen, protected screens inaccessible |
+| 9 | Session persistence | Close and reopen app → still logged in (if remember-me expected) |
+| 10 | Token expiry | Expired token → redirected to login without crash |
+| 11 | Biometric | Biometric prompt appears (if configured) → success logs in |
+| 12 | Social login | Social login button visible and tappable (if applicable) |
+| 13 | Forgot password | Forgot password link navigates to reset flow |
+
+---
+
+### Pattern: Form Screen
+
+**Triggers:** A screen with multiple input fields, validation, and a submit action. No navigation tabs.
+**Examples:** Create Post, Edit Profile, Checkout, Add Address, Feedback
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Load | Screen renders with all form fields visible |
+| 2 | Keyboard navigation | Tapping next/return moves focus to next field |
+| 3 | Keyboard avoidance | Fields near bottom remain visible when keyboard opens |
+| 4 | Valid submit | Fill all required fields → submit → success feedback |
+| 5 | Missing required | Submit with empty required field → error shown on that field |
+| 6 | Invalid format | Enter invalid format (bad email, too short) → format error |
+| 7 | Submit loading | Submit button shows loading state during request |
+| 8 | Double submit | Rapid double-tap on submit fires only one request |
+| 9 | Cancel / back | Navigate back → no data persisted |
+| 10 | Edit pre-fill | Editing existing record → fields pre-filled with current values |
+| 11 | Edit save | Change a field → save → updated value reflected on return |
+| 12 | Character limits | Fields with max length enforce or warn at limit |
+
+---
+
+### Pattern: Detail / Profile Screen
+
+**Triggers:** A read-mostly screen showing the full data for one entity. May have Edit, Delete, or action buttons.
+**Examples:** User Profile, Order Detail, Product Detail, Article, Event
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Load | Screen renders all sections with correct data |
+| 2 | Scroll | Long content scrolls without clipping |
+| 3 | Back navigation | Back button / swipe returns to list screen |
+| 4 | Edit action | Edit button opens edit form pre-filled with current data |
+| 5 | Delete action | Delete → confirmation prompt → removed → returns to list |
+| 6 | Share / copy | Share or copy button (if applicable) triggers system sheet |
+| 7 | Permission: edit | Edit/Delete absent for view-only user |
+| 8 | Deep link | Screen opens correctly from a deep link URL |
+| 9 | Loading state | Skeleton visible while data loads |
+| 10 | Error state | Network error shows retry, not blank screen |
+
+---
+
+### Pattern: Tab Navigation
+
+**Triggers:** A screen with a persistent bottom tab bar (or top tabs) switching between sections.
+**Examples:** Home / Explore / Messages / Profile tabs, Dashboard tabs
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Load | App opens on correct default tab |
+| 2 | Tab switching | Tapping each tab shows the correct screen |
+| 3 | Active indicator | Active tab is visually highlighted; inactive tabs are not |
+| 4 | Badge | Notification badge on tab increments and clears correctly |
+| 5 | State persistence | Navigate away from tab and return → scroll position and state preserved (if expected) |
+| 6 | Permission-gated tab | Tab absent or disabled for user without permission |
+| 7 | Android back on root | Pressing Android back on root tab does not crash; exits or shows confirm |
+| 8 | iOS home indicator | Bottom tabs are not obscured by iOS home indicator |
+
+---
+
+### Pattern: Stack Navigation
+
+**Triggers:** Screens pushed onto a navigation stack with a back button or back gesture.
+**Examples:** Any drill-down flow: List → Detail → Edit
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Push | Tapping item navigates forward to expected screen |
+| 2 | iOS back swipe | Swipe from left edge returns to previous screen |
+| 3 | Android back button | Hardware/gesture back returns to previous screen |
+| 4 | Header back button | Tapping header back arrow returns to previous screen |
+| 5 | Stack depth | Navigating deep (3+ levels) then back unwinds correctly |
+| 6 | Header title | Header shows correct title for each screen |
+| 7 | Reset on logout | Logging out clears the navigation stack (no back to protected screen) |
+
+---
+
+### Pattern: Settings Screen (Mobile)
+
+**Triggers:** A screen with toggles, pickers, account info, and no row-level CRUD.
+**Examples:** App Settings, Notification Preferences, Account, Privacy
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Load | Screen renders all settings sections |
+| 2 | Toggle — persist | Toggle a switch → background/foreground app → setting retained |
+| 3 | Picker — persist | Change a picker value → background/foreground → value retained |
+| 4 | Logout | Logout button in settings clears session and navigates to login |
+| 5 | Account info | Correct user name/email displayed |
+| 6 | Notification toggle | Enabling push notifications triggers system permission prompt (first time) |
+| 7 | Link to external | "Privacy Policy" / "Terms" links open in browser or in-app webview |
+| 8 | App version | App version displayed and matches expected build |
+
+---
+
+### Pattern: Onboarding Flow
+
+**Triggers:** Multi-step screens shown to new users before reaching the main app.
+**Examples:** Welcome slides, Permissions setup, Profile completion wizard
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | First launch | Fresh install opens onboarding, not main app |
+| 2 | Step progression | Next button advances to next step |
+| 3 | Back within flow | Back navigates to previous step (if allowed) |
+| 4 | Skip | Skip button (if present) bypasses optional steps |
+| 5 | Swipe between steps | Swiping advances/retreats steps (if carousel-style) |
+| 6 | Permission prompt | Notification/location permission prompt appears at correct step |
+| 7 | Complete | Completing all steps lands on main app screen |
+| 8 | Re-open after partial | Killing app mid-onboarding and reopening resumes at correct step (or restarts) |
+| 9 | Returning user | Returning user (token present) skips onboarding entirely |
+
+---
+
+### Pattern: Modal / Bottom Sheet
+
+**Triggers:** An overlay screen (full-screen modal, action sheet, or bottom sheet) triggered from another screen.
+**Examples:** Filter sheet, Confirmation dialog, Share sheet, Image picker, Date picker
+
+**Test cases to generate:**
+
+| # | Category | Test case |
+|---|---|---|
+| 1 | Open | Trigger opens the modal/sheet |
+| 2 | Dismiss — swipe | Swipe down dismisses the sheet (bottom sheet) |
+| 3 | Dismiss — backdrop | Tapping outside the sheet dismisses it (if applicable) |
+| 4 | Dismiss — button | Close/Cancel button dismisses without action |
+| 5 | Action — confirm | Confirming action produces correct result and closes sheet |
+| 6 | Action — cancel | Canceling produces no side effects |
+| 7 | Underlying screen | Underlying screen is not interactive while modal is open |
+| 8 | Keyboard in sheet | Text input inside sheet stays visible when keyboard opens |
+
+---
+
+## Web Universal Test Cases
+
+These go into `01-auth.md`, `02-navigation.md`, and the final `XX-cross-cutting.md` for web projects.
 
 ### Auth (01-auth.md)
 
@@ -157,6 +359,343 @@ These go into `01-auth.md`, `02-navigation.md`, and the final `XX-cross-cutting.
 
 ---
 
+## Mobile Universal Test Cases
+
+These go into `01-auth.md`, `02-navigation.md`, and `XX-cross-cutting.md` for React Native projects.
+
+### Auth (01-auth.md)
+
+- Valid credentials → navigates to home screen
+- Invalid credentials → inline error, stays on login screen, no crash
+- Expired token (force-expired via API or AsyncStorage clear) → redirected to login
+- Unauthenticated deep link → redirected to login, then to intended screen after login (if supported)
+- Logout clears token → protected screens inaccessible via back gesture
+- Session persistence: close and reopen → still logged in (if expected)
+- Biometric login (if configured) → success navigates to home
+
+### Navigation (02-navigation.md)
+
+- All tabs accessible to full-permission user
+- Permission-gated tabs absent or disabled for restricted user
+- Active tab indicator is correct on each tab
+- iOS: swipe-back gesture works on stack screens
+- Android: hardware back button works on stack screens; on root screen either exits app or shows exit confirm
+- Logging out resets navigation stack (back gesture cannot reach protected screens)
+- Deep links route to correct screen
+
+### Cross-Cutting (last task file)
+
+**Permissions (OS-level):**
+- First push notification trigger shows system permission prompt
+- Denying permission shows graceful fallback (no crash)
+- Camera/gallery permission prompt appears before access
+
+**Offline / network errors:**
+- No network → friendly offline banner or error message, no crash
+- Retry after reconnect works correctly
+
+**Platform behavior:**
+- iOS safe area: content not clipped by notch or home indicator
+- Android: status bar color matches app theme; no overlap with navigation bar
+- Keyboard: inputs visible above keyboard on both platforms
+
+**Performance / stability:**
+- App does not crash on rapid navigation (stress-tap tabs)
+- Memory: navigating through 10+ screens and back shows no blank screens
+
+**Forms:**
+- Double-tap submit fires only one request
+- Required fields validated before API call
+- Cancel / back discards unsaved data
+
+**Loading states:**
+- Skeleton or spinner visible on initial screen load
+- Submit buttons show loading state and are disabled during request
+- Pull-to-refresh spinner visible while refreshing
+
+---
+
+## Device Management
+
+### iOS Simulator
+
+```bash
+# List available simulators
+xcrun simctl list devices
+
+# List only booted simulators
+xcrun simctl list devices | grep Booted
+
+# Boot a simulator by UDID
+xcrun simctl boot <UDID>
+
+# Open Simulator app (to see the booted device)
+open -a Simulator
+
+# Install an .app bundle (from build output)
+xcrun simctl install booted path/to/MyApp.app
+
+# Launch installed app
+xcrun simctl launch booted com.company.appname
+
+# Capture screenshot
+xcrun simctl io booted screenshot qa/results/screenshots/screenshot.png
+```
+
+### Android Emulator
+
+```bash
+# List available AVDs
+emulator -list-avds
+
+# Start an emulator
+emulator -avd <AVD_NAME> &
+
+# List connected devices/emulators
+adb devices
+
+# Install APK
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+
+# Launch app
+adb shell am start -n com.company.appname/.MainActivity
+
+# Capture screenshot
+adb exec-out screencap -p > qa/results/screenshots/screenshot.png
+```
+
+### Maestro Setup
+
+```bash
+# Install Maestro
+curl -Ls "https://get.maestro.mobile.dev" | bash
+
+# Verify installation
+maestro --version
+
+# Run a single flow
+maestro test qa/flows/01-auth.yaml
+
+# Run a flow against a specific device (iOS)
+maestro --device <iOS_UDID> test qa/flows/01-auth.yaml
+
+# Run a flow against Android
+maestro --device <ANDROID_SERIAL> test qa/flows/01-auth.yaml
+
+# Run all flows in a directory
+maestro test qa/flows/
+
+# Export JUnit XML results
+maestro test qa/flows/01-auth.yaml --format junit --output qa/results/01-auth-junit.xml
+```
+
+---
+
+## Maestro Flow Templates
+
+Use these as starting points when generating `qa/flows/NN-name.yaml` files.
+
+### Template: Login Flow
+
+```yaml
+appId: com.company.appname
+---
+- launchApp:
+    clearState: true
+
+# Enter credentials
+- tapOn:
+    id: "email-input"       # testID="email-input", or use text: "Email"
+- inputText: "user@test.com"
+- tapOn:
+    id: "password-input"
+- inputText: "Password123!"
+
+# Submit
+- tapOn:
+    id: "login-button"
+
+# Assert success
+- assertVisible:
+    text: "Home"            # or id: "home-screen"
+- takeScreenshot: login-success
+```
+
+### Template: Navigate and Assert
+
+```yaml
+appId: com.company.appname
+---
+- launchApp: {}
+
+# Already logged in — navigate to Settings tab
+- tapOn:
+    id: "tab-settings"
+
+# Assert screen loaded
+- assertVisible:
+    id: "settings-screen"
+
+# Interact with a toggle
+- tapOn:
+    id: "notifications-toggle"
+
+# Assert toggle changed (check label or state)
+- assertVisible:
+    text: "Notifications enabled"
+
+- takeScreenshot: notifications-enabled
+```
+
+### Template: List → Detail
+
+```yaml
+appId: com.company.appname
+---
+- launchApp: {}
+
+# Navigate to list screen
+- tapOn:
+    id: "tab-orders"
+
+# Assert list loaded
+- assertVisible:
+    id: "order-list"
+
+# Scroll to find an item (if needed)
+- scrollUntilVisible:
+    element:
+      text: "Order #1234"
+    direction: DOWN
+
+# Tap item to open detail
+- tapOn:
+    text: "Order #1234"
+
+# Assert detail screen
+- assertVisible:
+    id: "order-detail-screen"
+- assertVisible:
+    text: "Order #1234"
+
+- takeScreenshot: order-detail
+```
+
+### Template: Form Fill and Submit
+
+```yaml
+appId: com.company.appname
+---
+- launchApp: {}
+
+# Navigate to form
+- tapOn:
+    id: "create-button"
+
+# Fill form fields
+- tapOn:
+    id: "name-input"
+- clearText
+- inputText: "Test Item"
+
+- tapOn:
+    id: "description-input"
+- clearText
+- inputText: "Test description for QA"
+
+# Submit
+- tapOn:
+    id: "submit-button"
+
+# Assert success
+- assertVisible:
+    text: "Item created"    # success toast or confirmation text
+
+- takeScreenshot: form-submit-success
+```
+
+### Template: Handle System Permission Dialog
+
+```yaml
+appId: com.company.appname
+---
+- launchApp:
+    clearState: true
+
+# Navigate to feature that triggers permission
+- tapOn:
+    id: "enable-notifications-button"
+
+# System permission dialog appears — Maestro handles it
+- allowPermission           # iOS: taps "Allow" on system dialog
+# For Android: same command works
+# To deny: - denyPermission
+
+# Assert app handled the permission
+- assertVisible:
+    id: "notifications-enabled-banner"
+
+- takeScreenshot: permission-granted
+```
+
+### Template: Scroll and Verify Empty State
+
+```yaml
+appId: com.company.appname
+---
+- launchApp: {}
+
+# Navigate to list
+- tapOn:
+    id: "tab-inbox"
+
+# Apply a filter that returns no results
+- tapOn:
+    id: "filter-button"
+- tapOn:
+    text: "Archived"
+
+# Scroll to bottom to confirm no items
+- scroll
+
+# Assert empty state visible
+- assertVisible:
+    id: "empty-state"       # or text: "No messages"
+
+- takeScreenshot: empty-state-archived
+```
+
+### Template: Back Navigation and Stack Reset
+
+```yaml
+appId: com.company.appname
+---
+- launchApp: {}
+
+# Go deep into the stack
+- tapOn:
+    id: "tab-home"
+- tapOn:
+    id: "first-item"        # pushes Detail screen
+- tapOn:
+    id: "edit-button"       # pushes Edit screen
+
+# Back twice via header back button
+- tapOn:
+    id: "back-button"
+- assertVisible:
+    id: "detail-screen"
+
+- tapOn:
+    id: "back-button"
+- assertVisible:
+    id: "home-screen"
+
+- takeScreenshot: back-navigation-complete
+```
+
+---
+
 ## Result Format
 
 Each task result file and the final summary follow the UAT executive report format below.
@@ -168,8 +707,10 @@ Each task result file and the final summary follow the UAT executive report form
 
 **Date:** YYYY-MM-DD
 **Branch:** [branch]
-**Tested by:** Automated QA (Playwright)
-**Scope:** [one-line description of what this area covers] — [base URL]
+**Tested by:** Automated QA (Playwright / Maestro)
+**Platform:** Web / iOS [device, OS version] / Android [device, OS version]
+**App version:** [version + build number — mobile only]
+**Scope:** [one-line description of what this area covers] — [base URL or bundle ID]
 **Test accounts:** [list accounts used]
 
 ---
@@ -195,7 +736,7 @@ Each task result file and the final summary follow the UAT executive report form
 
 ### [ID] — [Test case name]
 
-[Exact description of what happened, what was expected, what was observed. Include selector, URL, or error message if relevant.]
+[Exact description of what happened, what was expected, what was observed. Include element ID, screen name, or Maestro error if relevant.]
 
 ---
 
@@ -214,8 +755,10 @@ Screenshots saved to `qa/results/screenshots/` — filenames listed here if any 
 **Date:** YYYY-MM-DD
 **Branch:** [branch]
 **Reported by:** [name from git config or ask]
-**Tested by:** Automated QA (Playwright)
-**Scope:** [description of what was covered] — [base URL]
+**Tested by:** Automated QA (Playwright / Maestro)
+**Platform:** Web / iOS [device, OS] / Android [device, OS]
+**App version:** [version + build — mobile only]
+**Scope:** [description of what was covered] — [base URL or bundle ID]
 **Test accounts:** [list]
 
 ---
@@ -290,7 +833,7 @@ Screenshots saved to `qa/results/screenshots/` — filenames listed here if any 
 
 ## Testing Methodology
 
-[Paragraph: tool used, number of test cases, areas covered, auth method, any notable constraints or deviations from the test plan.]
+[Paragraph: tool used (Playwright for web / Maestro for mobile), number of test cases, areas covered, auth method, device/OS targets, any notable constraints or deviations from the test plan.]
 ```
 
 ---
